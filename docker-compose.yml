@@ -1,0 +1,27 @@
+services:
+  langfuse-prometheus-exporter:
+    build: .
+    image: langfuse-prometheus-exporter:local
+    container_name: langfuse-prometheus-exporter
+    restart: always
+    environment:
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-http://langfuse-web:3000}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      EXPORTER_PORT: "9101"
+      EXPORTER_WINDOWS: ${EXPORTER_WINDOWS:-5m,1h,24h}
+      EXPORTER_CACHE_TTL_SECONDS: ${EXPORTER_CACHE_TTL_SECONDS:-15}
+      # EXPORTER_CONFIG: /app/examples/config.yaml
+    ports:
+      - "9101:9101"
+    # Join your Langfuse docker network so http://langfuse-web:3000 resolves:
+    networks:
+      - langfuse
+    # Uncomment and adjust EXPORTER_CONFIG + volumes for custom metrics:
+    # volumes:
+    #   - ./examples/config.yaml:/app/examples/config.yaml:ro
+
+networks:
+  langfuse:
+    name: ${LANGFUSE_NETWORK:-langfuse_default}
+    external: true

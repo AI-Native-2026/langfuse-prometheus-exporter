@@ -1,0 +1,46 @@
+# Example custom metrics for langfuse-prometheus-exporter.
+# Enable with: EXPORTER_CONFIG=/app/examples/config.yaml
+# Requires PyYAML.
+metrics:
+  # Grouped metric: one series per observation name (top 50 by count in the last hour)
+  - name: langfuse_observations_by_name
+    help: "Observations by name (1h)"
+    view: observations
+    measure: count
+    aggregation: count
+    group_field: name
+    group_label: name
+    window: 1h
+    row_limit: 50
+
+  # Windowed metric: one series per window
+  - name: langfuse_output_cost_usd
+    help: "Output cost (USD) per window"
+    view: observations
+    measure: outputCost
+    aggregation: sum
+    windows: ["1h", "24h"]
+
+  # Grouped metric on a score view
+  - name: langfuse_scores_category_count
+    help: "Categorical scores by value (24h)"
+    view: scores-categorical
+    measure: count
+    aggregation: count
+    group_field: stringValue
+    group_label: value
+    window: 24h
+    row_limit: 50
+
+  # Filtered metric: only SPAN observations
+  - name: langfuse_span_count
+    help: "SPAN observations per window"
+    view: observations
+    measure: count
+    aggregation: count
+    windows: ["1h"]
+    filters:
+      - column: type
+        operator: "="
+        value: SPAN
+        type: string
